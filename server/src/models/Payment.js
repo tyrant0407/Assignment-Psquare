@@ -33,8 +33,7 @@ const paymentSchema = new mongoose.Schema({
   },
   transactionId: {
     type: String,
-    unique: true,
-    required: true
+    unique: true
   },
   // For future Razorpay integration
   razorpayOrderId: {
@@ -74,7 +73,15 @@ const paymentSchema = new mongoose.Schema({
 // Generate transaction ID before saving
 paymentSchema.pre('save', function (next) {
   if (!this.transactionId) {
-    this.transactionId = 'TXN' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase();
+    this.transactionId = 'TXN' + Date.now() + Math.random().toString(36).substring(2, 6).toUpperCase();
+  }
+  next();
+});
+
+// Ensure transactionId is always present before validation
+paymentSchema.pre('validate', function (next) {
+  if (!this.transactionId) {
+    this.transactionId = 'TXN' + Date.now() + Math.random().toString(36).substring(2, 6).toUpperCase();
   }
   next();
 });

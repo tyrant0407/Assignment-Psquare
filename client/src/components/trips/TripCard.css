@@ -1,0 +1,351 @@
+.trip-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Compact variant */
+.trip-card--compact {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.trip-card--compact:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.trip-card--compact .trip-card-content {
+  padding: 12px;
+}
+
+.trip-card--compact .trip-title {
+  font-size: 16px;
+}
+
+.trip-card--compact .current-price {
+  font-size: 20px;
+}
+
+.trip-card--compact .book-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.trip-card-image {
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+}
+
+.trip-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  top: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.badge.popular {
+  left: 12px;
+  background: #ef4444;
+}
+
+.badge.discount {
+  right: 12px;
+  background: #22c55e;
+}
+
+.trip-card-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.trip-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 14px;
+  opacity: 0.3;
+}
+
+.star.filled {
+  opacity: 1;
+}
+
+.review-count {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.trip-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: #1e293b;
+}
+
+.trip-route {
+  color: #64748b;
+  margin: 0 0 12px 0;
+  font-size: 14px;
+}
+
+.trip-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.detail-item .icon {
+  font-size: 16px;
+}
+
+.trip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.price-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.current-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.original-price {
+  font-size: 16px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.book-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.book-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Tablet styles */
+@media (max-width: 1024px) {
+  .trip-card-image {
+    height: 200px;
+  }
+
+  .trip-card-content {
+    padding: 16px;
+  }
+
+  .trip-title {
+    font-size: 18px;
+  }
+
+  .current-price {
+    font-size: 24px;
+  }
+
+  .original-price {
+    font-size: 16px;
+  }
+
+  .book-btn {
+    padding: 10px 20px;
+    font-size: 15px;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .trip-card {
+    border-radius: 10px;
+  }
+
+  .trip-card-image {
+    height: 180px;
+  }
+
+  .trip-card-content {
+    padding: 12px;
+  }
+
+  .trip-rating {
+    margin-bottom: 6px;
+  }
+
+  .stars {
+    gap: 1px;
+  }
+
+  .star {
+    font-size: 12px;
+  }
+
+  .review-count {
+    font-size: 11px;
+  }
+
+  .trip-title {
+    font-size: 16px;
+    margin-bottom: 3px;
+  }
+
+  .trip-route {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .trip-details {
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+
+  .detail-item {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .detail-item .icon {
+    font-size: 14px;
+  }
+
+  .trip-footer {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .price-section {
+    justify-content: center;
+  }
+
+  .current-price {
+    font-size: 20px;
+  }
+
+  .original-price {
+    font-size: 14px;
+  }
+
+  .book-btn {
+    width: 100%;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 3px 6px;
+    top: 10px;
+  }
+
+  .badge.popular {
+    left: 10px;
+  }
+
+  .badge.discount {
+    right: 10px;
+  }
+}
+
+/* Small mobile styles */
+@media (max-width: 480px) {
+  .trip-card-image {
+    height: 160px;
+  }
+
+  .trip-card-content {
+    padding: 10px;
+  }
+
+  .trip-title {
+    font-size: 15px;
+  }
+
+  .trip-route {
+    font-size: 12px;
+  }
+
+  .detail-item {
+    font-size: 12px;
+  }
+
+  .detail-item .icon {
+    font-size: 13px;
+  }
+
+  .current-price {
+    font-size: 18px;
+  }
+
+  .original-price {
+    font-size: 13px;
+  }
+
+  .book-btn {
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 2px 5px;
+  }
+}

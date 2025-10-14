@@ -6,8 +6,8 @@ import {
 } from "../utils/jwt.js";
 import { User } from "../models/User.js";
 
-const ACCESS_COOKIE = "access_token";
-const REFRESH_COOKIE = "refresh_token";
+const ACCESS_COOKIE = "accessToken";
+const REFRESH_COOKIE = "refreshToken";
 
 function cookieOptions({ secure, domain }) {
   return {

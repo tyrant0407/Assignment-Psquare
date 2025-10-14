@@ -1,14 +1,13 @@
 import { Router } from "express";
-import { validate } from "../middlewares/validate.js";
 import { requireAuth } from "../middlewares/auth.js";
 import {
-    schemas,
     createBooking,
     getUserBookings,
     getBookingById,
     updateBooking,
     cancelBooking,
-    getAvailableSeats
+    getAvailableSeats,
+    getAllBookings
 } from "../controllers/booking.controller.js";
 
 const router = Router();
@@ -17,13 +16,16 @@ const router = Router();
 router.use(requireAuth);
 
 // Booking routes
-router.post("/", validate(schemas.createBooking), createBooking);
+router.post("/", createBooking);
 router.get("/", getUserBookings);
 router.get("/:id", getBookingById);
-router.put("/:id", validate(schemas.updateBooking), updateBooking);
+router.put("/:id", updateBooking);
 router.delete("/:id", cancelBooking);
 
 // Seat availability
 router.get("/seats/:tripId", getAvailableSeats);
+
+// Admin route for getting all bookings (should be moved to admin routes in production)
+router.get("/admin/all", getAllBookings);
 
 export default router;

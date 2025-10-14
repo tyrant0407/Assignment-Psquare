@@ -11,27 +11,9 @@ const bookingSchema = new mongoose.Schema({
     ref: 'Trip',
     required: true
   },
-  passengers: [{
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    age: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 120
-    },
-    gender: {
-      type: String,
-      enum: ['male', 'female', 'other'],
-      required: true
-    },
-    seatNumber: {
-      type: String,
-      required: true
-    }
+  selectedSeats: [{
+    type: String,
+    required: true
   }],
   totalAmount: {
     type: Number,
@@ -58,22 +40,19 @@ const bookingSchema = new mongoose.Schema({
   },
   bookingReference: {
     type: String,
-    unique: true,
-    required: true
+    unique: true
   },
-  contactInfo: {
-    email: {
-      type: String,
-      required: true
+  // Payment details will be collected during payment processing
+  paymentDetails: {
+    name: {
+      type: String
     },
-    phone: {
-      type: String,
-      required: true
+    email: {
+      type: String
+    },
+    phonenumber: {
+      type: String
     }
-  },
-  specialRequests: {
-    type: String,
-    maxlength: 500
   }
 }, {
   timestamps: true
@@ -82,7 +61,15 @@ const bookingSchema = new mongoose.Schema({
 // Generate booking reference before saving
 bookingSchema.pre('save', function (next) {
   if (!this.bookingReference) {
-    this.bookingReference = 'BK' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase();
+    this.bookingReference = 'BK' + Date.now() + Math.random().toString(36).substring(2, 6).toUpperCase();
+  }
+  next();
+});
+
+// Ensure bookingReference is always present before validation
+bookingSchema.pre('validate', function (next) {
+  if (!this.bookingReference) {
+    this.bookingReference = 'BK' + Date.now() + Math.random().toString(36).substring(2, 6).toUpperCase();
   }
   next();
 });
@@ -91,7 +78,7 @@ bookingSchema.pre('save', function (next) {
 bookingSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'trip',
-    select: 'title from to departureDate price duration'
+    select: 'from to dateTime price totalSeats availableSeats status'
   }).populate({
     path: 'user',
     select: 'name email'
