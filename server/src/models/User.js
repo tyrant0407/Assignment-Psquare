@@ -33,3 +33,4 @@ userSchema.statics.hashPassword = async function (plain) {
 };
 
 export const User = mongoose.model("User", userSchema);
+

@@ -6,21 +6,18 @@ import {
   refreshTokens,
 } from "../middlewares/auth.js";
 import { env } from "../config/env.js";
-import { User } from "../models/User.js";
+import {User} from "../models/User.js";
+
 
 export const schemas = {
   register: Joi.object({
-    body: Joi.object({
-      name: Joi.string().min(2).required(),
-      email: Joi.string().email().required(),
-      password: Joi.string().min(6).required(),
-    }),
+    name: Joi.string().min(2).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
   }),
   login: Joi.object({
-    body: Joi.object({
-      email: Joi.string().email().required(),
-      password: Joi.string().min(6).required(),
-    }),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
   }),
 };
 
@@ -85,9 +82,9 @@ export async function me(req, res, next) {
   try {
     const user = await User.findById(req.user.id).select('-passwordHash -tokenVersion').lean();
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" 
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
       });
     }
 

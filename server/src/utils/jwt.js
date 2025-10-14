@@ -1,22 +1,22 @@
-import jwt from "jsonwebtoken";
-import { env } from "../config/env.js";
+import jwt from 'jsonwebtoken';
+import { env } from '../config/env.js';
 
-export function signAccessToken(payload) {
+export const signAccessToken = (payload) => {
   return jwt.sign(payload, env.jwt.accessSecret, {
-    expiresIn: env.jwt.accessExpiresIn,
+    expiresIn: env.jwt.accessExpiresIn
   });
-}
+};
 
-export function signRefreshToken(payload) {
+export const signRefreshToken = (payload) => {
   return jwt.sign(payload, env.jwt.refreshSecret, {
-    expiresIn: env.jwt.refreshExpiresIn,
+    expiresIn: env.jwt.refreshExpiresIn
   });
-}
+};
 
-export function verifyAccessToken(token) {
+export const verifyAccessToken = (token) => {
   return jwt.verify(token, env.jwt.accessSecret);
-}
+};
 
-export function verifyRefreshToken(token) {
+export const verifyRefreshToken = (token) => {
   return jwt.verify(token, env.jwt.refreshSecret);
-}
+};

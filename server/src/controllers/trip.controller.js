@@ -1,6 +1,5 @@
 import Joi from 'joi';
-import Trip from '../models/Trip.js';
-import { createError } from '../utils/error.js';
+import * as tripService from '../services/trip.service.js';
 
 // Validation schemas
 export const schemas = {
@@ -52,22 +51,11 @@ export const schemas = {
 export const getAllTrips = async (req, res, next) => {
     try {
         const { page = 1, limit = 10, status = 'active' } = req.query;
-
-        const trips = await Trip.find({ status })
-            .sort({ departureDate: 1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit);
-
-        const total = await Trip.countDocuments({ status });
+        const result = await tripService.getAllTrips({ page, limit, status });
 
         res.json({
             success: true,
-            trips,
-            pagination: {
-                currentPage: page,
-                totalPages: Math.ceil(total / limit),
-                totalTrips: total
-            }
+            ...result
         });
     } catch (error) {
         next(error);
@@ -78,44 +66,11 @@ export const getAllTrips = async (req, res, next) => {
 export const searchTrips = async (req, res, next) => {
     try {
         const { from, to, date, page = 1, limit = 10 } = req.query;
-
-        const filter = { status: 'active' };
-
-        if (from) {
-            filter.from = new RegExp(from, 'i');
-        }
-
-        if (to) {
-            filter.to = new RegExp(to, 'i');
-        }
-
-        if (date) {
-            const searchDate = new Date(date);
-            const nextDay = new Date(searchDate);
-            nextDay.setDate(nextDay.getDate() + 1);
-
-            filter.departureDate = {
-                $gte: searchDate,
-                $lt: nextDay
-            };
-        }
-
-        const trips = await Trip.find(filter)
-            .sort({ departureDate: 1, price: 1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit);
-
-        const total = await Trip.countDocuments(filter);
+        const result = await tripService.searchTrips({ from, to, date, page, limit });
 
         res.json({
             success: true,
-            trips,
-            searchCriteria: { from, to, date },
-            pagination: {
-                currentPage: page,
-                totalPages: Math.ceil(total / limit),
-                totalTrips: total
-            }
+            ...result
         });
     } catch (error) {
         next(error);
@@ -126,12 +81,7 @@ export const searchTrips = async (req, res, next) => {
 export const getTripById = async (req, res, next) => {
     try {
         const { id } = req.params;
-
-        const trip = await Trip.findById(id);
-
-        if (!trip) {
-            return next(createError(404, 'Trip not found'));
-        }
+        const trip = await tripService.getTripById(id);
 
         res.json({
             success: true,
@@ -145,11 +95,7 @@ export const getTripById = async (req, res, next) => {
 // Create trip (admin only)
 export const createTrip = async (req, res, next) => {
     try {
-        const tripData = req.body;
-        tripData.availableSeats = tripData.totalSeats;
-
-        const trip = new Trip(tripData);
-        await trip.save();
+        const trip = await tripService.createTrip(req.body);
 
         res.status(201).json({
             success: true,
@@ -165,21 +111,7 @@ export const createTrip = async (req, res, next) => {
 export const updateTrip = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
-
-        const trip = await Trip.findById(id);
-
-        if (!trip) {
-            return next(createError(404, 'Trip not found'));
-        }
-
-        // If totalSeats is being updated, recalculate availableSeats
-        if (updates.totalSeats) {
-            updates.availableSeats = updates.totalSeats - trip.bookedSeats.length;
-        }
-
-        Object.assign(trip, updates);
-        await trip.save();
+        const trip = await tripService.updateTrip(id, req.body);
 
         res.json({
             success: true,
@@ -195,19 +127,7 @@ export const updateTrip = async (req, res, next) => {
 export const deleteTrip = async (req, res, next) => {
     try {
         const { id } = req.params;
-
-        const trip = await Trip.findById(id);
-
-        if (!trip) {
-            return next(createError(404, 'Trip not found'));
-        }
-
-        // Check if trip has bookings
-        if (trip.bookedSeats.length > 0) {
-            return next(createError(400, 'Cannot delete trip with existing bookings'));
-        }
-
-        await Trip.findByIdAndDelete(id);
+        await tripService.deleteTrip(id);
 
         res.json({
             success: true,

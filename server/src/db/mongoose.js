@@ -6,9 +6,8 @@ mongoose.set("strictQuery", true);
 
 export async function connectToDatabase() {
   if (mongoose.connection.readyState === 1) return mongoose;
-  await mongoose.connect(env.mongoUri, {
-    autoIndex: env.nodeEnv !== "production",
-  }).then(() => {
+  console.log(env.mongoUri)
+  await mongoose.connect(env.mongoUri).then(() => {
     logger.info("Connected to database");
   }).catch((err) => {
     logger.error(err, "Failed to connect to database");
