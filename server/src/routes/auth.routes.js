@@ -13,8 +13,8 @@ import rateLimit from "express-rate-limit";
 
 const router = Router();
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-router.use(limiter);
+// const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+// router.use(limiter);
 
 router.post("/register", validate(schemas.register), register);
 router.post("/login", validate(schemas.login), login);

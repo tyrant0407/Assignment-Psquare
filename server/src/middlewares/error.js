@@ -1,10 +1,24 @@
-// Centralized error handler
-export function notFound(req, res, next) {
-  res.status(404).json({ success: false, message: "Not Found" });
-}
+export const notFound = (req, res, next) => {
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  error.status = 404;
+  next(error);
+};
 
-export function errorHandler(err, req, res, next) {
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  res.status(status).json({ success: false, message });
-}
+export const errorHandler = (error, req, res, next) => {
+  const status = error.status || 500;
+  const message = error.message || 'Internal Server Error';
+
+  // Log error in development
+  if (process.env.NODE_ENV === 'development') {
+    console.error(error);
+  }
+
+  res.status(status).json({
+    success: false,
+    error: {
+      message,
+      status,
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+    }
+  });
+};

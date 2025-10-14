@@ -9,6 +9,8 @@ import { notFound, errorHandler } from "./middlewares/error.js";
 import authRoutes from "./routes/auth.routes.js";
 import tripRoutes from "./routes/trip.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import bookingRoutes from "./routes/booking.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
 
 const app = express();
 
@@ -33,9 +35,11 @@ app.set("authLimiter", authLimiter);
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 // Routes placeholders (to be mounted later)
-app.use("/api/auth", app.get("authLimiter"), authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // 404 and Error handler
 app.use(notFound);

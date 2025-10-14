@@ -1,81 +1,39 @@
-import {
-  verifyAccessToken,
-  verifyRefreshToken,
-  signAccessToken,
-  signRefreshToken,
-} from "../utils/jwt.js";
-import { User } from "../models/User.js";
+import jwt from 'jsonwebtoken';
+import { env } from '../config/env.js';
+import { createError } from '../utils/error.js';
+import User from '../models/User.js';
 
-const ACCESS_COOKIE = "access_token";
-const REFRESH_COOKIE = "refresh_token";
-
-function cookieOptions({ secure, domain }) {
-  return {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: secure,
-    domain: domain,
-    path: "/",
-  };
-}
-
-export function setAuthCookies(res, { userId, role, tokenVersion }, options) {
-  const access = signAccessToken({ sub: userId, role, tv: tokenVersion });
-  const refresh = signRefreshToken({ sub: userId, role, tv: tokenVersion });
-  const opts = cookieOptions(options);
-  res.cookie(ACCESS_COOKIE, access, { ...opts });
-  res.cookie(REFRESH_COOKIE, refresh, { ...opts });
-}
-
-export function clearAuthCookies(res, options) {
-  const opts = cookieOptions(options);
-  res.clearCookie(ACCESS_COOKIE, opts);
-  res.clearCookie(REFRESH_COOKIE, opts);
-}
-
-export async function requireAuth(req, res, next) {
+export const requireAuth = async (req, res, next) => {
   try {
-    const token = req.cookies[ACCESS_COOKIE];
-    if (!token)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    const payload = verifyAccessToken(token);
-    req.user = { id: payload.sub, role: payload.role, tv: payload.tv };
-    next();
-  } catch (err) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
-  }
-}
+    const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
 
-export function requireRole(role) {
-  return (req, res, next) => {
-    if (!req.user || req.user.role !== role) {
-      return res.status(403).json({ success: false, message: "Forbidden" });
+    if (!token) {
+      return next(createError(401, 'Access token required'));
     }
-    next();
-  };
-}
 
-export async function refreshTokens(req, res) {
-  try {
-    const token = req.cookies[REFRESH_COOKIE];
-    if (!token)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    const payload = verifyRefreshToken(token);
-    const user = await User.findById(payload.sub).lean();
-    if (!user)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    if (user.tokenVersion !== payload.tv) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+    const decoded = jwt.verify(token, env.jwt.secret);
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (!user) {
+      return next(createError(401, 'Invalid token'));
     }
-    setAuthCookies(
-      res,
-      { userId: user._id, role: user.role, tokenVersion: user.tokenVersion },
-      { secure: false }
-    );
-    return res.json({ success: true });
-  } catch (err) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
-  }
-}
 
-export const authCookieNames = { ACCESS_COOKIE, REFRESH_COOKIE };
+    req.user = user;
+    next();
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return next(createError(401, 'Invalid token'));
+    }
+    if (error.name === 'TokenExpiredError') {
+      return next(createError(401, 'Token expired'));
+    }
+    next(error);
+  }
+};
+
+export const requireAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return next(createError(403, 'Admin access required'));
+  }
+  next();
+};

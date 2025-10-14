@@ -1,21 +1,14 @@
-export function validate(schema) {
+import { createError } from '../utils/error.js';
+
+export const validate = (schema) => {
   return (req, res, next) => {
-    const data = { body: req.body, query: req.query, params: req.params };
-    const { error, value } = schema.validate(data, {
-      abortEarly: false,
-      allowUnknown: true,
-    });
+    const { error } = schema.validate(req.body);
+
     if (error) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: error.details.map((d) => d.message).join(", "),
-        });
+      const message = error.details.map(detail => detail.message).join(', ');
+      return next(createError(400, message));
     }
-    req.body = value.body || req.body;
-    req.query = value.query || req.query;
-    req.params = value.params || req.params;
+
     next();
   };
-}
+};
