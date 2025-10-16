@@ -41,7 +41,10 @@ export const useBookings = () => {
 
     const createBooking = useCallback(async (bookingData) => {
         const result = await dispatch(addBooking(bookingData));
-        return result.type === 'bookings/addBooking/fulfilled';
+        if (result.type === 'bookings/addBooking/fulfilled') {
+            return result.payload; // Return the actual booking data
+        }
+        return null;
     }, [dispatch]);
 
     const updateBooking = useCallback(async (id, bookingData) => {

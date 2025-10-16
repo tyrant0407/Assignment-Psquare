@@ -26,8 +26,11 @@ const PaymentPage = () => {
     });
 
     useEffect(() => {
+        console.log('PaymentPage - Checking booking data:', { bookingId, trip, selectedSeats });
+
         // Redirect if no booking data
         if (!bookingId || !trip || !selectedSeats || selectedSeats.length === 0) {
+            console.log('PaymentPage - Missing booking data, redirecting to home');
             navigate('/');
             return;
         }

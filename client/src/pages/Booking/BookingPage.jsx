@@ -10,7 +10,7 @@ import SeatMap from '../../components/booking/SeatMap';
 const BookingPage = () => {
     const { tripId } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, isLoggedIn, isCheckingAuth } = useAuth();
     const { currentTrip, loading, error, getTripById, clearCurrentTripData } = useTrips();
     const { createBooking, loading: bookingLoading, bookings } = useBookings();
     const [selectedSeats, setSelectedSeats] = useState([]);
@@ -42,7 +42,12 @@ const BookingPage = () => {
             return;
         }
 
-        if (!user) {
+        if (isCheckingAuth) {
+            alert('Please wait while we verify your authentication...');
+            return;
+        }
+
+        if (!user || !isLoggedIn) {
             alert('Please login to continue with booking');
             navigate('/login');
             return;
@@ -61,23 +66,35 @@ const BookingPage = () => {
                 totalAmount: currentTrip.price * selectedSeats.length
             };
 
-            const success = await createBooking(bookingData);
+            console.log('Auth state:', { user, isLoggedIn, isCheckingAuth });
+            console.log('Creating booking with data:', bookingData);
+            const createdBooking = await createBooking(bookingData);
+            console.log('Booking creation result:', createdBooking);
 
-            if (success) {
-                // Get the created booking from Redux state (most recent booking)
-                const createdBooking = bookings[0];
-                const bookingId = createdBooking?._id || createdBooking?.id;
+            if (createdBooking) {
+                // Get booking ID from the returned booking data
+                const bookingId = createdBooking.booking?._id || createdBooking.booking?.id || createdBooking._id || createdBooking.id;
+                console.log('Extracted booking ID:', bookingId);
 
-                // Navigate to payment page with booking ID and trip data
-                navigate('/payment', {
-                    state: {
+                if (bookingId) {
+                    const navigationState = {
                         bookingId,
                         trip: currentTrip,
                         selectedSeats,
                         totalAmount: currentTrip.price * selectedSeats.length
-                    }
-                });
+                    };
+                    console.log('Navigating to payment with state:', navigationState);
+
+                    // Navigate to payment page with booking ID and trip data
+                    navigate('/payment', {
+                        state: navigationState
+                    });
+                } else {
+                    console.error('Booking created but no ID found:', createdBooking);
+                    alert('Booking created but unable to proceed to payment. Please check your bookings.');
+                }
             } else {
+                console.error('Booking creation failed - no booking returned');
                 alert('Failed to create booking. Please try again.');
             }
         } catch (err) {

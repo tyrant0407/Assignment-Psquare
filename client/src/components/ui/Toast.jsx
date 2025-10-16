@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const Toast = ({ message, type = 'success', duration = 3000, onClose }) => {
     const [isVisible, setIsVisible] = useState(true);
@@ -22,7 +22,7 @@ const Toast = ({ message, type = 'success', duration = 3000, onClose }) => {
     };
 
     const getToastStyles = () => {
-        const baseStyles = "fixed top-4 right-4 z-50 flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg transition-all duration-300 transform";
+        const baseStyles = "fixed top-4 right-4 z-[9999] flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg transition-all duration-300 transform";
 
         if (!isVisible) {
             return `${baseStyles} opacity-0 translate-x-full`;
@@ -78,7 +78,7 @@ const Toast = ({ message, type = 'success', duration = 3000, onClose }) => {
 // Toast container component
 export const ToastContainer = ({ toasts, removeToast }) => {
     return (
-        <div className="fixed top-0 right-0 z-50 p-4 space-y-2">
+        <div className="fixed top-0 right-0 z-[9999] p-4 space-y-2">
             {toasts.map((toast) => (
                 <Toast
                     key={toast.id}
